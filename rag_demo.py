@@ -1,15 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-RAG 演示脚本：对 knowledge_files 里的资料建索引并回答一个问题。
 
-用法（PowerShell，在 A7_practical_training 目录下）：
-    第一次运行前：
-        $env:HF_ENDPOINT = "https://hf-mirror.com"      # 国内下载向量模型走镜像
-        $env:DEEPSEEK_API_KEY = "sk-你的新key"           # 不写进代码
-        python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple sentence-transformers faiss-cpu
-    之后每次运行：
-        python rag_demo.py "你的问题"
-"""
 import sys
 from rag_utils import build_rag, rag_ask
 
