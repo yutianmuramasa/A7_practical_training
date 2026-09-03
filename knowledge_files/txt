@@ -1,0 +1,103 @@
+#知识库表
+conn = sqlite3.connect('database.db')
+cursor = conn.cursor()
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS knowledge (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        course_name TEXT,
+        teacher_username TEXT,
+        filename TEXT,
+        content TEXT,
+        is_active INTEGER DEFAULT 1
+    )
+''')
+conn.commit()
+conn.close()
+
+
+#题库表
+conn = sqlite3.connect('database.db')
+cursor = conn.cursor()
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS question_bank (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    question TEXT,
+    answer TEXT,
+    explanation TEXT,
+    type TEXT,
+    teacher_username TEXT,
+    course_name TEXT
+)
+''')
+conn.commit()
+conn.close()
+
+
+#做题记录
+conn = sqlite3.connect('database.db')
+cursor = conn.cursor()
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS answer_records (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    question_id INTEGER,
+    question TEXT,
+    student_answer TEXT,
+    correct_answer TEXT,
+    result INTEGER,
+    student TEXT,
+    type TEXT,
+    teacher_username TEXT,
+    course_name TEXT,
+    feedback TEXT
+);
+''')
+conn.commit()
+conn.close()
+
+
+#用户表
+conn = sqlite3.connect('database.db')
+cursor = conn.cursor()
+cursor.execute('''
+    CREATE TABLE if not EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE,
+    password TEXT,
+    role TEXT,
+    user_number TEXT
+    )
+''')
+conn.commit()
+conn.close()
+
+
+#课程表
+conn=sqlite3.connect('database.db')
+cursor=conn.cursor()
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS courses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    teacher_username TEXT NOT NULL
+);
+''')
+conn.commit()
+conn.close()
+
+
+#选课表
+conn=sqlite3.connect('database.db')
+cursor=conn.cursor()
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS student_courses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_username TEXT NOT NULL,
+    course_id INTEGER NOT NULL,
+    FOREIGN KEY (student_username) REFERENCES users(username),
+    FOREIGN KEY (course_id) REFERENCES courses(id)
+    UNIQUE(student_username, course_id)  -- 禁止重复添加
+);
+
+''')
+conn.commit()
+conn.close()

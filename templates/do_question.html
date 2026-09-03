@@ -1,0 +1,82 @@
+<!-- templates/do_question.html -->
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>刷题中</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .question-container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 30px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    .question-section {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 6px;
+      border: 1px solid #dee2e6;
+      margin-bottom: 20px;
+    }
+    .question-content {
+      padding: 15px;
+      background-color: #f8f9fa;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+    }
+    .form-label {
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="question-container">
+    <div class="mb-4">
+      <h4 class="mb-0 text-success">当前题型：{{ q_type }} | 题目ID：{{ question[0] }}</h4>
+    </div>
+
+    <div class="question-section">
+      <form method="POST" action="/submit_answer/{{ question[0] }}">
+        <div class="mb-4">
+          <label class="form-label">题目内容：</label>
+          <div class="question-content">{{ question[1]|safe }}</div>
+        </div>
+
+        {% if q_type == '选择题' %}
+        <div class="mb-4">
+          <label class="form-label">选择你的答案：</label>
+          <div class="ps-3">
+            {% for option in ['A', 'B', 'C', 'D'] %}
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="answer" id="option{{ option }}" value="{{ option }}" required>
+              <label class="form-check-label" for="option{{ option }}">
+                {{ option }}
+              </label>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% else %}
+        <div class="mb-4">
+          <label class="form-label">输入你的答案：</label>
+          <textarea name="answer" class="form-control" rows="4" required></textarea>
+        </div>
+        {% endif %}
+
+        <div class="text-end">
+          <button type="submit" class="btn btn-primary">提交答案</button>
+          <a href="/student/practice_select" class="btn btn-outline-secondary ms-2">返回练习首页</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

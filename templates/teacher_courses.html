@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title>课程管理</title>
+  <style>
+    body {
+      font-family: 'Microsoft YaHei', sans-serif;
+      background-color: #f4f7fa;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    h2 {
+      color: #333;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 30px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    form {
+      margin: 0;
+    }
+    .btn-delete {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-delete:hover {
+      background-color: #c82333;
+    }
+    .add-form {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .add-form input[type="text"] {
+      padding: 8px;
+      width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .btn-add {
+      padding: 8px 16px;
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .btn-add:hover {
+      background-color: #45a049;
+    }
+    .back {
+      margin-top: 30px;
+      text-align: center;
+    }
+    .back a {
+      text-decoration: none;
+      padding: 10px 20px;
+      background: #6c757d;
+      color: white;
+      border-radius: 6px;
+    }
+    .back a:hover {
+      background-color: #5a6268;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>📚 我的课程管理</h2>
+
+  <table>
+    <tr>
+      <th>课程名</th>
+      <th>操作</th>
+    </tr>
+    {% for course in courses %}
+    <tr>
+      <td>{{ course[1] }}</td>
+      <td>
+        <form method="POST" action="/teacher/delete_course/{{ course[0] }}" onsubmit="return confirm('确认删除课程【{{ course[1] }}】？')">
+          <button type="submit" class="btn-delete">删除</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <form class="add-form" method="POST" action="/teacher/add_course">
+    <label>新增课程名：</label>
+    <input type="text" name="course_name" required>
+    <input type="submit" class="btn-add" value="添加课程">
+  </form>
+
+  <div class="back">
+    <a href="/teacher">返回教师首页</a>
+  </div>
+</div>
+</body>
+</html>

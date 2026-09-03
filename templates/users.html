@@ -1,0 +1,13 @@
+<h3>用户管理</h3>
+
+<table border="1">
+    <tr><th>用户名</th><th>身份</th></tr>
+    {% for user in users %}
+    <tr>
+        <td>{{ user[0] }}</td>
+        <td>{{ user[1] }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="/admin">返回首页</a>

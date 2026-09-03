@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>自动生成题目</title>
+    <style>
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background-color: #f2f4f8;
+            padding: 40px 20px;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .form-container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 20px;
+            color: #333;
+        }
+        select, input[type="submit"] {
+            padding: 10px 12px;
+            width: 100%;
+            margin-top: 6px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+            background-color: #fff;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            margin-top: 30px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .link-area {
+            text-align: center;
+            margin-top: 25px;
+        }
+        .link-area a {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #6c757d;
+            color: #fff;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .link-area a:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <h2>自动生成题目</h2>
+    <form method="post">
+        <label for="type">选择题型：</label>
+        <select name="type" id="type" required>
+            <option value="choice">选择题</option>
+            <option value="blank">填空题</option>
+            <option value="short">简答题</option>
+            <option value="code">编程题</option>
+        </select>
+
+        <label for="course_name">选择归属课程：</label>
+        <select name="course_name" id="course_name" required>
+            {% for course in courses %}
+            <option value="{{ course }}">{{ course }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="knowledge_id">选择知识来源：</label>
+        <select name="knowledge_id" id="knowledge_id" required>
+            <option value="all">全部知识库</option>
+        </select>
+
+        <input type="submit" value="生成题目">
+    </form>
+
+    <div class="link-area">
+        <a href="/teacher">返回教师首页</a>
+    </div>
+</div>
+
+<script>
+    // 从后端传入知识库列表
+    const rawKnowledge = {{ knowledge_list | tojson }};
+    const courseSelect = document.getElementById("course_name");
+    const knowledgeSelect = document.getElementById("knowledge_id");
+
+    function updateKnowledgeOptions() {
+        const selectedCourse = courseSelect.value;
+        knowledgeSelect.innerHTML = '<option value="all">全部知识库</option>';
+
+        rawKnowledge.forEach(item => {
+            const [id, filename, course_name] = item;
+            if (course_name === selectedCourse) {
+                const opt = document.createElement("option");
+                opt.value = id;
+                opt.textContent = filename;
+                knowledgeSelect.appendChild(opt);
+            }
+        });
+    }
+
+    updateKnowledgeOptions();
+    courseSelect.addEventListener("change", updateKnowledgeOptions);
+</script>
+</body>
+</html>

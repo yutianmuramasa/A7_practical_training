@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>我的教学计划列表</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1000px;
+            margin-top: 40px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .table th, .table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+        .form-select, .form-control {
+            min-height: 38px;
+        }
+        .header-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #343a40;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="header-title">我的教学计划列表</h2>
+
+    <!-- 筛选表单 -->
+    <form method="GET" class="row mb-4">
+        <div class="col-md-4">
+            <select name="course" class="form-select">
+                <option value="">所有课程</option>
+                {% for course in course_names %}
+                <option value="{{ course }}" {% if selected_course == course %}selected{% endif %}>{{ course }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <input type="text" name="search" class="form-control" placeholder="按标题关键词搜索" value="{{ search_query or '' }}">
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary w-100">筛选</button>
+        </div>
+    </form>
+
+    <!-- 教学计划表格 -->
+    <table class="table table-bordered">
+        <thead class="table-light">
+        <tr>
+            <th>标题</th>
+            <th>课程</th>
+            <th>创建时间</th>
+            <th>修正总耗时</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for p in plans %}
+        <tr>
+            <td>{{ p[1] }}</td>
+            <td>{{ p[2] }}</td>
+            <td>{{ p[3] }}</td>
+            <td>{{ p[4] or 0 }} 秒</td>
+            <td>
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="/teacher/edit_plan/{{ p[0] }}" class="btn btn-sm btn-outline-primary">继续修正</a>
+                    <form action="/teacher/delete_plan/{{ p[0] }}" method="POST" onsubmit="return confirm('确定要删除该教学计划吗？');">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">删除</button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="text-center mt-4">
+        <a href="/teacher" class="btn btn-secondary">返回教师首页</a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

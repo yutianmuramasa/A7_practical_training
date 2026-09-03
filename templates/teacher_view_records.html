@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>学生做题记录查看</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #f7f9fb;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        select, input[type="text"], button {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+        .filter-bar {
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .record-block {
+            background: #ffffff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .record-header {
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .note-box {
+            margin-top: 8px;
+            background: #e9f5ff;
+            padding: 10px;
+            border-left: 4px solid #17a2b8;
+        }
+        .score {
+            font-weight: bold;
+        }
+        .student-card {
+            position: relative;
+            padding: 8px 16px;
+            margin: 6px;
+            background: #e6f3ff;
+            border: 1px solid #99c;
+            border-radius: 8px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .student-card button {
+            position: absolute;
+            top: 0;
+            right: 5px;
+            border: none;
+            background: transparent;
+            font-weight: bold;
+            color: red;
+            cursor: pointer;
+        }
+        .back-top {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+        }
+        .back-top a {
+            text-decoration: none;
+            background-color: #6c757d;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+        }
+        .back-top a:hover {
+            background-color: #5a6268;
+        }
+        .action-btn {
+            margin-right: 8px;
+            padding: 6px 10px;
+            border-radius: 5px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+        }
+        .feedback-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+        .submit-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="back-top">
+        <a href="/teacher"> 返回教师首页</a>
+    </div>
+
+    <h2>学生做题记录查看</h2>
+
+    <!-- 课程选择 -->
+    <form method="GET">
+        <label>选择课程：</label>
+        <select name="course" onchange="this.form.submit()">
+            {% for course in courses %}
+            <option value="{{ course }}" {% if course == selected_course %}selected{% endif %}>{{ course }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+    {% if selected_course %}
+    <div class="filter-bar">
+        <form method="GET">
+            <input type="hidden" name="course" value="{{ selected_course }}">
+            <input type="text" name="student_search" placeholder="搜索学生用户名..." value="{{ student_search }}">
+            <label>题型：</label>
+            <select name="type">
+                <option value="">全部</option>
+                {% for t in types %}
+                <option value="{{ t }}" {% if t == selected_type %}selected{% endif %}>{{ t }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">筛选</button>
+        </form>
+    </div>
+
+    {% if students %}
+    {% for student, records in students.items() %}
+    <div class="record-block">
+        <div class="record-header"> 学生：{{ student }}</div>
+        {% for rec in records %}
+        <div style="margin-left: 10px;">
+            <div><strong>题型：</strong>{{ rec['type'] }} | <strong>题目ID：</strong>{{ rec['id'] }}</div>
+            <div><strong>题干：</strong>{{ rec['question'] }}</div>
+            <div><strong>学生答案：</strong>{{ rec['student_answer'] }}</div>
+            <div><strong>正确答案：</strong>{{ rec['correct_answer'] }}</div>
+            <div>
+                <strong>得分：</strong>
+                <span class="score" style="color: {% if rec['result'] >= 80 %}green{% elif rec['result'] >= 60 %}orange{% else %}red{% endif %};">
+                        {{ rec['result'] }} / 100
+                    </span>
+            </div>
+            {% if rec['feedback'] %}
+            <div class="note-box"> 自动化检测反馈：{{ rec['feedback'] }}</div>
+            {% endif %}
+            <div style="margin-top: 8px;">
+                <form method="POST" action="/teacher/delete_record/{{ rec['id'] }}" style="display:inline;">
+                    <button class="action-btn delete-btn">删除记录</button>
+                </form>
+                {% if rec['result'] != 100 %}
+                <form method="POST" action="/teacher/generate_feedback/{{ rec['id'] }}" style="display:inline;">
+                    <button class="action-btn feedback-btn">生成错误分析</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        <hr>
+        {% endfor %}
+    </div>
+    {% endfor %}
+    {% else %}
+    <p>未找到相关学生或做题记录。</p>
+    {% endif %}
+    {% endif %}
+
+    <h3>选择学生进行教学分析（点击删除不需要的学生）：</h3>
+    {% if all_students %}
+    <form method="POST" action="/teacher/generate_analysis" id="analysisForm">
+        <input type="hidden" name="course" value="{{ selected_course }}">
+        <div id="student-cards">
+            {% for student in all_students %}
+            <div class="student-card" data-username="{{ student }}">
+                {{ student }}
+                <button type="button" onclick="removeStudent(this)">×</button>
+                <input type="hidden" name="selected_students" value="{{ student }}">
+            </div>
+            {% endfor %}
+        </div>
+        <button type="submit" class="submit-btn">生成教学分析</button>
+    </form>
+    {% else %}
+    <p style="color: gray;">未筛选出任何学生，请先选择课程并筛选。</p>
+    {% endif %}
+</div>
+
+<script>
+    function removeStudent(btn) {
+        btn.parentElement.remove();
+    }
+</script>
+</body>
+</html>

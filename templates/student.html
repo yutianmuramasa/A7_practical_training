@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>学生端首页</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .student-container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 30px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        .student-section {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+        }
+        .student-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .student-section li {
+            margin-bottom: 15px;
+        }
+        .student-section a {
+            display: block;
+            padding: 10px 15px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #212529;
+            background-color: #f8f9fa;
+            transition: background-color 0.2s ease;
+        }
+        .student-section a:hover {
+            background-color: #e2e6ea;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="student-container">
+        <div class="mb-4">
+            <h2 class="mb-0">学生端首页</h2>
+        </div>
+
+        <div class="student-section">
+            <p class="mb-3">欢迎，学生</p>
+            <ul>
+                <li><a href="/student/courses">选课</a></li>
+                <li><a href="/student/practice_select">题目练习</a></li>
+                <li><a href="/student/view_records">查看我的做题记录</a></li>
+                <li><a href="/student/ask">在线学习助手</a></li>
+                <li><a href="/logout">退出登录</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

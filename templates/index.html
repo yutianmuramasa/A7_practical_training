@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>教学实训智能体</title>
+    <script>
+        function getQuestion() {
+            fetch('/api/get_question')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('question').innerText = data.question;
+                });
+        }
+
+        function submitAnswer() {
+            const answer = document.getElementById('answer').value;
+            fetch('/api/submit_answer', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({answer: answer})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('result').innerText = '判定结果：' + data.result;
+                });
+        }
+    </script>
+</head>
+<body>
+<h1>教学实训智能体</h1>
+<button onclick="getQuestion()">生成题目</button>
+<p id="question">题目内容会显示在这里</p>
+
+<textarea id="answer" rows="4" cols="50" placeholder="在这里输入答案..."></textarea><br>
+<button onclick="submitAnswer()">提交答案</button>
+
+<p id="result">判定结果会显示在这里</p>
+</body>
+</html>

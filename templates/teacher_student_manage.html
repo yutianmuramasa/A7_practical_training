@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <title>学生管理</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #f4f7fa;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        h3 {
+            color: #444;
+            margin-top: 30px;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            box-shadow: 0 0 4px rgba(0,0,0,0.05);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        a.delete-link {
+            color: #dc3545;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a.delete-link:hover {
+            text-decoration: underline;
+        }
+        form.add-form {
+            margin-top: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+        form.add-form input[type="text"],
+        form.add-form select {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        form.add-form input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        form.add-form input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .msg {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .back {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .back a {
+            text-decoration: none;
+            padding: 10px 20px;
+            background: #6c757d;
+            color: white;
+            border-radius: 6px;
+        }
+        .back a:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2> 学生管理</h2>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="msg">{{ messages[0] }}</div>
+    {% endif %}
+    {% endwith %}
+
+    {% for course_id, course_name, students in course_students %}
+    <h3> 课程：{{ course_name }}</h3>
+    <table>
+        <tr><th>学生账号</th><th>操作</th></tr>
+        {% for student in students %}
+        <tr>
+            <td>{{ student }}</td>
+            <td><a href="/teacher/delete_student_from_course/{{ course_id }}/{{ student }}" class="delete-link" onclick="return confirm('确认移除学生【{{ student }}】吗？')">删除</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endfor %}
+
+    <h3> 手动添加学生到课程</h3>
+    <form method="POST" action="/teacher/add_student_to_course" class="add-form">
+        <label>学生账号：</label>
+        <input type="text" name="student_username" required>
+        <label>课程：</label>
+        <select name="course_id">
+            {% for course_id, course_name, _ in course_students %}
+            <option value="{{ course_id }}">{{ course_name }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="添加">
+    </form>
+
+    <div class="back">
+        <a href="/teacher"> 返回教师首页</a>
+    </div>
+</div>
+</body>
+</html>

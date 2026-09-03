@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生成教学计划</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f7fa;
+        }
+        .form-container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-title {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #343a40;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 10px;
+            font-weight: 500;
+        }
+        .knowledge-select {
+            height: 150px;
+        }
+        .btn-back {
+            background-color: #6c757d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="form-container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="form-title mb-0">生成教学计划</h2>
+            <a href="/teacher" class="btn btn-back">返回教师首页</a>
+        </div>
+
+        <form id="planForm" action="/teacher/generate_plan" method="POST">
+            <!-- 教学计划标题输入 -->
+            <div class="mb-3">
+                <label for="planTitle" class="form-label">教学计划标题</label>
+                <input type="text" class="form-control" id="planTitle" name="plan_title"
+                       placeholder="请输入教学计划标题，如：嵌入式系统第1-3周计划" required>
+            </div>
+
+            <!-- 课程选择 -->
+            <div class="mb-3">
+                <label for="courseSelect" class="form-label">选择课程</label>
+                <select class="form-select" id="courseSelect" name="course_id" required>
+                    <option value="" selected disabled>请选择课程</option>
+                    {% for course in courses %}
+                    <option value="{{ course[0] }}">{{ course[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- 知识库文件选择 -->
+            <div class="mb-3">
+                <label for="knowledgeSelect" class="form-label">选择知识库文件</label>
+                <select class="form-select knowledge-select" id="knowledgeSelect" name="knowledge_id" multiple required>
+                    <option value="all" selected>全部知识库文件</option>
+                </select>
+                <div class="form-text">按住 Ctrl 键可多选，默认已选择全部文件</div>
+            </div>
+
+            <!-- 补充要求 -->
+            <div class="mb-4">
+                <label for="extraRequest" class="form-label">教学补充要求</label>
+                <textarea class="form-control" id="extraRequest" name="extra_request" rows="4"
+                          placeholder="请输入您对教学计划的特殊要求或补充说明..."></textarea>
+            </div>
+
+            <!-- 提交按钮 -->
+            <button type="submit" class="btn btn-primary submit-btn">生成教学计划</button>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('courseSelect').addEventListener('change', function () {
+        const courseId = this.value;
+        const knowledgeSelect = document.getElementById('knowledgeSelect');
+
+        if (!courseId) {
+            knowledgeSelect.innerHTML = '<option value="all" selected>全部知识库文件</option>';
+            return;
+        }
+
+        const courseName = this.options[this.selectedIndex].text;
+
+        fetch(`/get_knowledge_by_course?course_name=${encodeURIComponent(courseName)}`)
+            .then(response => response.json())
+            .then(data => {
+                let options = '<option value="all" selected>全部知识库文件</option>';
+
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        options += `<option value="${item.id}">${item.filename}</option>`;
+                    });
+                } else {
+                    options += '<option disabled>该课程暂无知识库文件</option>';
+                }
+
+                knowledgeSelect.innerHTML = options;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                knowledgeSelect.innerHTML = '<option disabled>加载知识库失败</option>';
+            });
+    });
+</script>
+
+</body>
+</html>

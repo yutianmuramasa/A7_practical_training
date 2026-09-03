@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课件资源管理</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .resource-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .resource-section {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .resource-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .resource-item:last-child {
+            border-bottom: none;
+        }
+        .export-btn {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="resource-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">课件资源管理</h2>
+            <a href="/admin" class="btn btn-secondary">返回管理员首页</a>
+        </div>
+        <!-- 筛选表单 -->
+        <form method="get" class="mb-4">
+            <div class="row g-3">
+                <div class="col-md-5">
+                    <label for="courseSelect" class="form-label">选择课程</label>
+                    <select class="form-select" id="courseSelect" name="course" onchange="this.form.submit()">
+                        <option value="">-- 请选择课程 --</option>
+                        {% for course in courses %}
+                        <option value="{{ course }}" {% if course == selected_course %}selected{% endif %}>
+                            {{ course }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                {% if selected_course %}
+                <div class="col-md-5">
+                    <label for="teacherSelect" class="form-label">选择教师</label>
+                    <select class="form-select" id="teacherSelect" name="teacher" onchange="this.form.submit()">
+                        <option value="">-- 请选择教师 --</option>
+                        {% for teacher in teachers %}
+                        <option value="{{ teacher }}" {% if teacher == selected_teacher %}selected{% endif %}>
+                            {{ teacher }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+            </div>
+        </form>
+
+        {% if selected_course and selected_teacher %}
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>{{ selected_course }} - {{ selected_teacher }} 的资源</h4>
+            <div>
+                <a href="/admin/export_resources?course={{ selected_course }}&teacher={{ selected_teacher }}&type=plans"
+                   class="btn btn-sm btn-outline-primary export-btn">
+                    导出全部教学计划
+                </a>
+                <a href="/admin/export_resources?course={{ selected_course }}&teacher={{ selected_teacher }}&type=knowledge"
+                   class="btn btn-sm btn-outline-success export-btn">
+                    导出全部知识库
+                </a>
+                <a href="/admin/export_resources?course={{ selected_course }}&teacher={{ selected_teacher }}&type=questions"
+                   class="btn btn-sm btn-outline-info export-btn">
+                    导出全部题目
+                </a>
+            </div>
+        </div>
+
+        <!-- 教学计划部分 -->
+        <div class="resource-section">
+            <h5>教学计划 ({{ resources.plans|length }}个)</h5>
+            {% if resources.plans %}
+            {% for plan in resources.plans %}
+            <div class="resource-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>{{ plan[1] }}</strong>
+                    <div class="text-muted small">{{ plan[2] }}</div>
+                </div>
+                <a href="/admin/export_resources?course={{ selected_course }}&teacher={{ selected_teacher }}&type=plans&plan_id={{ plan[0] }}"
+                   class="btn btn-sm btn-outline-secondary">
+                    导出
+                </a>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="text-muted">暂无教学计划</div>
+            {% endif %}
+        </div>
+
+        <!-- 知识库部分 -->
+        <div class="resource-section">
+            <h5>知识库文件 ({{ resources.knowledge_files|length }}个)</h5>
+            {% if resources.knowledge_files %}
+            {% for file in resources.knowledge_files %}
+            <div class="resource-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>{{ file[1] }}</strong>
+                    <div class="text-muted small">{{ file[2] }}</div>
+                </div>
+                <a href="/admin/export_resources?course={{ selected_course }}&teacher={{ selected_teacher }}&type=knowledge&file_id={{ file[0] }}"
+                   class="btn btn-sm btn-outline-secondary">
+                    导出
+                </a>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="text-muted">暂无知识库文件</div>
+            {% endif %}
+        </div>
+
+        <!-- 题目统计部分 -->
+        <div class="resource-section">
+            <h5>题目统计</h5>
+            {% if resources.question_stats %}
+            <table class="table table-sm">
+                <thead>
+                <tr>
+                    <th>题型</th>
+                    <th>数量</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for stat in resources.question_stats %}
+                <tr>
+                    <td>{{ stat[0] }}</td>
+                    <td>{{ stat[1] }}</td>
+                    <td>
+                        <a href="/admin/export_resources?course={{ selected_course }}&teacher={{ selected_teacher }}&type=questions&q_type={{ stat[0] }}"
+                           class="btn btn-sm btn-outline-secondary">
+                            导出此类
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="text-muted">暂无题目</div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

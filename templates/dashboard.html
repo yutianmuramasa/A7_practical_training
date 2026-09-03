@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>管理员大屏总览</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+<div class="max-w-screen-xl mx-auto px-6 py-6">
+
+    <!-- 顶部标题与返回 -->
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold">管理员大屏总览</h2>
+        <a href="/admin" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm">返回管理员首页</a>
+    </div>
+
+    <!-- 教师/学生 今日与本周功能使用 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+        <!-- 教师 今日 -->
+        <div class="bg-white p-6 rounded shadow">
+            <button class="font-semibold text-lg mb-2 text-left w-full" onclick="toggleSection('teacher-today')">教师各功能使用（今日）</button>
+            <div id="teacher-today" style="display: none;">
+                <ul class="list-disc pl-6 text-gray-800">
+                    {% for label, count in teacher_usage_stats.items() %}
+                    <li>{{ label }}：{{ count }} 次</li>
+                    {% endfor %}
+                </ul>
+                <p class="mt-3 text-sm">生成题目数：<strong>{{ teacher_question_today }}</strong></p>
+                <p class="mt-1 text-sm">功能总使用次数：<strong>{{ teacher_today_total_usage }}</strong></p>
+                <p class="mt-1 text-sm text-red-600">最活跃功能：<strong>{{ top_teacher_action_today }}</strong></p>
+            </div>
+            <hr class="my-4">
+            <button class="font-semibold text-lg mb-2 text-left w-full" onclick="toggleSection('student-today')">学生各功能使用（今日）</button>
+            <div id="student-today" style="display: none;">
+                <ul class="list-disc pl-6 text-gray-800">
+                    {% for label, count in student_usage_stats.items() %}
+                    <li>{{ label }}：{{ count }} 次</li>
+                    {% endfor %}
+                </ul>
+                <p class="mt-3 text-sm">做题数：<strong>{{ student_answer_today }}</strong></p>
+                <p class="mt-1 text-sm">功能总使用次数：<strong>{{ student_today_total }}</strong></p>
+                <p class="mt-1 text-sm text-blue-600">最活跃功能：<strong>{{ top_student_action_today }}</strong></p>
+            </div>
+        </div>
+
+        <!-- 教师 本周 -->
+        <div class="bg-white p-6 rounded shadow">
+            <button class="font-semibold text-lg mb-2 text-left w-full" onclick="toggleSection('teacher-week')">教师各功能使用（本周）</button>
+            <div id="teacher-week" style="display: none;">
+                <ul class="list-disc pl-6 text-gray-800">
+                    {% for label, count in teacher_usage_weekly.items() %}
+                    <li>{{ label }}：{{ count }} 次</li>
+                    {% endfor %}
+                </ul>
+                <p class="mt-3 text-sm">功能总使用次数：<strong>{{ teacher_week_total }}</strong></p>
+                <p class="mt-1 text-sm text-red-600">最活跃功能：<strong>{{ top_teacher_action_week }}</strong></p>
+            </div>
+            <hr class="my-4">
+            <button class="font-semibold text-lg mb-2 text-left w-full" onclick="toggleSection('student-week')">学生各功能使用（本周）</button>
+            <div id="student-week" style="display: none;">
+                <ul class="list-disc pl-6 text-gray-800">
+                    {% for label, count in student_usage_weekly.items() %}
+                    <li>{{ label }}：{{ count }} 次</li>
+                    {% endfor %}
+                </ul>
+                <p class="mt-3 text-sm">做题数：<strong>{{ student_answer_week }}</strong></p>
+                <p class="mt-1 text-sm">功能总使用次数：<strong>{{ student_week_total }}</strong></p>
+                <p class="mt-1 text-sm text-blue-600">最活跃功能：<strong>{{ top_student_action_week }}</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 学生学习效果分析模块 -->
+    <div class="bg-white p-6 rounded shadow mb-10">
+        <h3 class="text-xl font-semibold mb-4">学生学习效果分析（按课程）</h3>
+        <form method="post" action="/admin/update_learning_analysis" class="flex flex-wrap gap-4 mb-4">
+            <input type="text" name="keyword" placeholder="请输入课程关键字"
+                   oninput="searchCourses(this.value)"
+                   class="border rounded px-3 py-2 w-64">
+            <select id="course-select" name="course_teacher" required class="border rounded px-3 py-2 w-96">
+                <option value="">请选择课程</option>
+            </select>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">更新学生学习效果的统计</button>
+        </form>
+        {% if learning_analysis %}
+        <p class="text-sm text-gray-500 mb-2">最后更新时间：{{ learning_analysis.updated_at }}</p>
+        <p><strong>课程：</strong>{{ learning_analysis.course_name }} - {{ learning_analysis.teacher_username }}</p>
+        <p><strong>平均正确率趋势：</strong>{{ learning_analysis.correct_trend }}</p>
+        <p><strong>知识点掌握情况：</strong>{{ learning_analysis.mastery_summary }}</p>
+        <p><strong>高频错误知识点：</strong>{{ learning_analysis.top_wrong_knowledge }}</p>
+        {% else %}
+        <p class="text-gray-600">暂无学生学习效果分析数据</p>
+        {% endif %}
+    </div>
+
+    <!-- 教学效率指数分析模块 -->
+    <div class="bg-white p-6 rounded shadow">
+        <h3 class="text-xl font-semibold mb-4">教学效率指数分析（按课程）</h3>
+        <form method="post" action="/admin/update_efficiency" class="flex flex-wrap gap-4 mb-4">
+            <input type="text" name="eff_keyword" placeholder="请输入课程关键字"
+                   oninput="searchEfficiencyCourses(this.value)"
+                   class="border rounded px-3 py-2 w-64">
+            <select id="eff-course-select" name="eff_course_teacher" required class="border rounded px-3 py-2 w-96">
+                <option value="">请选择课程</option>
+            </select>
+            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">更新教学效率指数的统计</button>
+        </form>
+        {% if efficiency_analysis %}
+        <p class="text-sm text-gray-500 mb-2">最后更新时间：{{ efficiency_analysis.updated_at }}</p>
+        <p><strong>课程：</strong>{{ efficiency_analysis.course_name }} - {{ efficiency_analysis.teacher_username }}</p>
+        <p><strong>备课与修正耗时：</strong>{{ efficiency_analysis.plan_time_summary }}</p>
+        <p><strong>练习设计与修正耗时：</strong>{{ efficiency_analysis.practice_time_summary }}</p>
+        <p><strong>课程优化方向：</strong>{{ efficiency_analysis.suggestion_summary }}</p>
+        {% else %}
+        <p class="text-gray-600">暂无教学效率分析数据</p>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- 脚本 -->
+<script>
+    function toggleSection(id) {
+        const el = document.getElementById(id);
+        el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function searchCourses(keyword) {
+        fetch(`/admin/search_courses?keyword=${encodeURIComponent(keyword)}`)
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById("course-select");
+                select.innerHTML = '<option value="">请选择课程</option>';
+                data.forEach(item => {
+                    const option = document.createElement("option");
+                    option.value = item.course_name + '|' + item.teacher_username;
+                    option.textContent = item.course_name + ' - ' + item.teacher_username;
+                    select.appendChild(option);
+                });
+            });
+    }
+
+    function searchEfficiencyCourses(keyword) {
+        fetch(`/admin/search_courses?keyword=${encodeURIComponent(keyword)}`)
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById("eff-course-select");
+                select.innerHTML = '<option value="">请选择课程</option>';
+                data.forEach(item => {
+                    const option = document.createElement("option");
+                    option.value = item.course_name + '|' + item.teacher_username;
+                    option.textContent = item.course_name + ' - ' + item.teacher_username;
+                    select.appendChild(option);
+                });
+            });
+    }
+</script>
+</body>
+</html>

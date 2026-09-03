@@ -1,0 +1,52 @@
+<!-- templates/teacher_analysis_report.html -->
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>教学分析报告</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background-color: #f8f9fa;
+        }
+        .box {
+            border: 1px solid #ccc;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 5px #aaa;
+        }
+        pre {
+            white-space: pre-wrap;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .back-top-right {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 5px;
+            text-decoration: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            z-index: 999;
+        }
+        .back-top-right:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<a href="/teacher/view_records" class="back-top-right">返回查看记录</a>
+
+<h2>教学分析报告</h2>
+<div class="box">
+    <pre>{{ analysis }}</pre>
+</div>
+
+</body>
+</html>

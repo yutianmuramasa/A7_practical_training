@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>知识库管理</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f7fa;
+        }
+        .container-box {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .course-block {
+            margin-bottom: 20px;
+        }
+        .file-item {
+            padding: 10px;
+            background-color: #eef2ff;
+            border-left: 4px solid #4f46e5;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .file-item form {
+            display: inline-block;
+            margin-left: 15px;
+        }
+        .btn-upload {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .btn-delete {
+            background-color: #e3342f;
+            color: white;
+        }
+        .btn-back {
+            background-color: #6c757d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-box mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">上传新知识库</h2>
+        <a href="/teacher" class="btn btn-back">返回教师首页</a>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label class="form-label">选择课程：</label>
+            <select name="course_name" class="form-select" required>
+                <option value="">-- 请选择课程 --</option>
+                {% for course in courses %}
+                <option value="{{ course }}">{{ course }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">选择文件（PDF / TXT / DOCX）：</label>
+            <input type="file" name="file" class="form-control" required>
+        </div>
+
+        <button type="submit" class="btn btn-upload">上传</button>
+    </form>
+</div>
+
+<div class="container-box">
+    <h2 class="mb-3">我的知识库文件</h2>
+    {% if knowledge_by_course %}
+    {% for course, files in knowledge_by_course.items() %}
+    <div class="course-block">
+        <h5 class="fw-bold">课程：{{ course }}</h5>
+        {% for file in files %}
+        <div class="file-item d-flex justify-content-between align-items-center">
+            <div>{{ file.filename }}</div>
+            <form method="POST" action="/teacher/delete_knowledge/{{ file.id }}">
+                <button type="submit" class="btn btn-sm btn-delete">删除</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+    {% else %}
+    <p class="text-muted">你还未上传任何知识库文件。</p>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

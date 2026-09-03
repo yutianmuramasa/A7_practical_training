@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>我的选课</title>
+    <style>
+        body {
+            font-family: Arial;
+            background-color: #f8f8f8;
+            padding: 30px;
+        }
+        h2, h3 {
+            color: #333;
+        }
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin-bottom: 30px;
+            background-color: white;
+            box-shadow: 0 0 6px rgba(0,0,0,0.05);
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f3f3f3;
+        }
+        select, button {
+            padding: 8px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        a {
+            color: #FF6347;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .back-top-right {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 5px;
+            text-decoration: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        .back-top-right:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<a href="/student" class="back-top-right"> 返回学生首页</a>
+
+<h2>我已选的课程</h2>
+<table>
+    <tr><th>课程名</th><th>任课老师</th><th>操作</th></tr>
+    {% for course in selected_courses %}
+    <tr>
+        <td>{{ course[1] }}</td>
+        <td>{{ course[2] }}</td>
+        <td><a href="{{ url_for('drop_course', course_id=course[0]) }}">退选</a></td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h3>添加课程</h3>
+<form method="POST" action="/student/choose_course">
+    <label for="course_id">选择课程：</label>
+    <select name="course_id" required>
+        {% for course in all_courses %}
+        <option value="{{ course[0] }}">{{ course[1] }}（{{ course[2] }}）</option>
+        {% endfor %}
+    </select>
+    <button type="submit">添加课程</button>
+</form>
+
+</body>
+</html>
