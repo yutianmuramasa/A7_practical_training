@@ -1,15 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-RAG 工具：课程资料 → 本地向量库 → 检索增强问答
-- 向量化：本地 sentence-transformers bge-small-zh-v1.5（免费，CPU 可跑，不花 API 钱）
-- 检索：faiss-cpu（免费）
-- 生成：DeepSeek API（仅"生成"环节花钱，每次问答几分钱以内）
 
-用法：
-    from rag_utils import build_rag, rag_ask
-    rag = build_rag("knowledge_files")   # 首次运行建索引并缓存到 rag_cache/
-    print(rag_ask(rag, "什么是BP神经网络？"))
-"""
 import os
 import re
 import glob
