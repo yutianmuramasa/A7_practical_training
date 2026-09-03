@@ -1816,6 +1816,47 @@ def student_ask():
         answer = call_llm_for_ask(prompt)
         return render_template('student_ask_result.html', question=question, answer=answer)
 
+# ===== RAG 检索增强答疑（新增，基于 rag_utils）=====
+try:
+    from rag_utils import build_rag, rag_ask
+    _rag_available = True
+except Exception:
+    _rag_available = False
+
+_rag_index_obj = None
+
+
+def _get_rag_index():
+    global _rag_index_obj
+    if _rag_index_obj is None:
+        _rag_index_obj = build_rag("knowledge_files")
+    return _rag_index_obj
+
+
+@app.route('/student/ask_rag', methods=['GET', 'POST'])
+def student_ask_rag():
+    """RAG 答疑：先检索 knowledge_files 中最相关的资料片段，再让模型依据资料回答，答案可溯源。"""
+    if session.get('role') != 'student':
+        return '无权限访问'
+    if not _rag_available:
+        return render_template('student_ask_result.html', question='',
+                               answer='RAG 组件不可用：请先执行 pip install sentence-transformers faiss-cpu')
+    if request.method == 'POST':
+        question = (request.form.get('question') or '').strip()
+    else:
+        question = (request.args.get('question') or '').strip()
+    if not question:
+        return render_template('student_ask_result.html', question='', answer='请输入问题')
+    try:
+        rag = _get_rag_index()  # 首次调用会加载向量模型并建立/读取索引（之后走缓存，很快）
+        hits = rag.retrieve(question, top_k=4)
+        answer = rag_ask(rag, question, top_k=4)
+        sources = "、".join(sorted({src for _, _, src in hits}))
+        answer = f"{answer}\n\n（本回答依据资料：{sources}）"
+    except Exception as e:
+        answer = f"[RAG 调用失败] {e}"
+    return render_template('student_ask_result.html', question=question, answer=answer)
+
 @app.route('/student/view_records', methods=['GET'])
 def view_student_records():
     student = session.get('username')
